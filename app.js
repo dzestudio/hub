@@ -1,5 +1,10 @@
 const BADGE_LABELS = { producao: 'Produção', staging: 'Staging', desenvolvimento: 'Dev' };
 
+const toKebab = s => s
+  .replace(/([a-z])([A-Z])/g, '$1-$2')
+  .replace(/([a-zA-Z])(\d)/g, '$1-$2')
+  .toLowerCase();
+
 let allSystems = [];
 let activeEnv  = 'all';
 
@@ -11,7 +16,7 @@ async function getConfig() {
 
 async function fetchSystems(supabaseUrl, supabaseAnon) {
   const params = new URLSearchParams({
-    select: 'slug,nome,descricao,ambiente,url_base',
+    select: 'slug,nome,descricao,ambiente,url_base,icone',
     status: 'eq.ativo',
     order:  'nome.asc',
   });
@@ -37,8 +42,13 @@ function card(s) {
     ? `<a class="card-btn" href="${esc(s.url_base)}" target="_blank" rel="noopener">Abrir</a>`
     : `<button class="card-btn disabled" disabled>Sem URL</button>`;
 
+  const iconHtml = s.icone
+    ? `<div class="card-icon"><i data-lucide="${esc(toKebab(s.icone))}"></i></div>`
+    : '';
+
   return `
     <article class="card" data-env="${esc(s.ambiente)}">
+      ${iconHtml}
       <div class="card-top">
         <span class="card-name">${esc(s.nome)}</span>
         <span class="${badgeClass}">${badgeLabel}</span>
@@ -67,6 +77,7 @@ function render(query = '') {
   const empty = document.getElementById('empty');
   grid.innerHTML = filtered.map(card).join('');
   empty.classList.toggle('hidden', filtered.length > 0);
+  window.lucide?.createIcons();
 }
 
 async function init() {

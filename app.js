@@ -1,9 +1,8 @@
 const BADGE_LABELS = { producao: 'Produção', staging: 'Staging', desenvolvimento: 'Dev' };
 
-const toKebab = s => s
-  .replace(/([a-z])([A-Z])/g, '$1-$2')
-  .replace(/([a-zA-Z])(\d)/g, '$1-$2')
-  .toLowerCase();
+const toIconifyId = icone => icone
+  ? (icone.includes(':') ? icone : 'lucide:' + icone)
+  : '';
 
 let allSystems = [];
 let activeEnv  = 'all';
@@ -43,7 +42,7 @@ function card(s) {
     : `<button class="card-btn disabled" disabled>Sem URL</button>`;
 
   const iconHtml = s.icone
-    ? `<div class="card-icon"><i data-lucide="${esc(toKebab(s.icone))}"></i></div>`
+    ? `<div class="card-icon"><iconify-icon icon="${esc(toIconifyId(s.icone))}" width="24" height="24"></iconify-icon></div>`
     : '';
 
   return `
@@ -77,7 +76,6 @@ function render(query = '') {
   const empty = document.getElementById('empty');
   grid.innerHTML = filtered.map(card).join('');
   empty.classList.toggle('hidden', filtered.length > 0);
-  window.lucide?.createIcons();
 }
 
 async function init() {

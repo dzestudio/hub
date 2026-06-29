@@ -1,0 +1,11 @@
+{
+  "name": "hub",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve . -p 3000",
+    "deploy": "wrangler pages deploy . --commit-dirty=true"
+  },
+  "devDependencies": {
+    "wrangler": "^3.101.0"
+  }
+}

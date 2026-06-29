@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hub — DZ Estudio</title>
+  <meta name="description" content="Central de acesso a todos os sistemas da DZ Estudio." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-logo">⚡</span>
+        <div>
+          <div class="brand-name">DZ Estudio</div>
+          <div class="brand-subtitle">Hub de Sistemas</div>
+        </div>
+      </div>
+      <div class="search-wrap">
+        <input
+          id="search"
+          class="search-input"
+          type="search"
+          placeholder="Buscar sistema…"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-env="all">Todos</button>
+      <button class="filter-btn" data-env="producao">Produção</button>
+      <button class="filter-btn" data-env="staging">Staging</button>
+      <button class="filter-btn" data-env="desenvolvimento">Dev</button>
+    </div>
+
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty hidden">Nenhum sistema encontrado.</div>
+    <div id="loading" class="loading">Carregando sistemas…</div>
+    <div id="error" class="error hidden"></div>
+  </main>
+
+  <footer class="footer">
+    <span>© 2026 DZ Estudio</span>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

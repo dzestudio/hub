@@ -27,8 +27,7 @@ body {
 
 /* ── NAI bar ── */
 .nai-bar {
-  border-top:    1px solid var(--hairline);
-  border-bottom: 1px solid var(--hairline);
+  background: var(--canvas-dark);
   padding: 6px var(--s5);
   display: flex;
   justify-content: space-between;

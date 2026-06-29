@@ -2,7 +2,7 @@
   "name": "hub",
   "private": true,
   "scripts": {
-    "dev": "npx serve . -p 3000",
+    "dev": "wrangler pages dev . --compatibility-date=2024-09-23",
     "deploy": "wrangler pages deploy . --commit-dirty=true"
   },
   "devDependencies": {

@@ -1,21 +1,24 @@
-const SUPABASE_URL  = 'https://omfvbifkyjstlpqeumgk.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tZnZiaWZreWpzdGxwcWV1bWdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1MjgyNjMsImV4cCI6MjA5ODEwNDI2M30.vc3amC8mAJNuT9CnH3CytzOabfS-v-FLliIctm-aaFc';
-
 const BADGE_LABELS = { producao: 'Produção', staging: 'Staging', desenvolvimento: 'Dev' };
 
 let allSystems = [];
 let activeEnv  = 'all';
 
-async function fetchSystems() {
+async function getConfig() {
+  const res = await fetch('/config');
+  if (!res.ok) throw new Error(`Config HTTP ${res.status}`);
+  return res.json();
+}
+
+async function fetchSystems(supabaseUrl, supabaseAnon) {
   const params = new URLSearchParams({
     select: 'slug,nome,descricao,ambiente,url_base',
     status: 'eq.ativo',
     order:  'nome.asc',
   });
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/sistemas?${params}`, {
+  const res = await fetch(`${supabaseUrl}/rest/v1/sistemas?${params}`, {
     headers: {
-      'apikey':         SUPABASE_ANON,
-      'Authorization':  `Bearer ${SUPABASE_ANON}`,
+      'apikey':         supabaseAnon,
+      'Authorization':  `Bearer ${supabaseAnon}`,
       'Accept-Profile': 'iam',
     },
   });
@@ -72,7 +75,8 @@ async function init() {
   const search  = document.getElementById('search');
 
   try {
-    allSystems = await fetchSystems();
+    const { url, anon } = await getConfig();
+    allSystems = await fetchSystems(url, anon);
   } catch (e) {
     loading.classList.add('hidden');
     errEl.textContent = 'Erro ao carregar sistemas. Tente novamente.';

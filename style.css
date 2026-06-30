@@ -145,8 +145,54 @@ body {
   color: var(--canvas);
 }
 
-/* ── Grid ── */
+/* ── Grid (container principal) ── */
 .grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+}
+
+/* ── Grupo section ── */
+.grupo-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+}
+
+.grupo-section-plain {
+  gap: 0;
+}
+
+.grupo-header {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding-bottom: var(--s3);
+  border-bottom: 1px solid var(--hairline);
+  color: var(--ink-muted);
+}
+
+.grupo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.grupo-nome {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.grupo-desc {
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+/* ── Cards grid dentro de cada grupo ── */
+.grupo-cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--s4);
@@ -282,5 +328,6 @@ body {
   .header-inner { height: auto; padding: var(--s3) var(--s4); flex-wrap: wrap; gap: var(--s3); }
   .search-wrap  { max-width: 100%; margin-left: 0; order: 3; flex-basis: 100%; }
   .main         { padding: var(--s4); }
-  .grid         { grid-template-columns: 1fr; gap: var(--s3); }
+  .grid         { gap: var(--s6); }
+  .grupo-cards  { grid-template-columns: 1fr; gap: var(--s3); }
 }

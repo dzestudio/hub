@@ -5,6 +5,7 @@ const toIconifyId = icone => icone
   : '';
 
 let allSystems = [];
+let allGroups  = [];
 let activeEnv  = 'all';
 
 async function getConfig() {
@@ -13,11 +14,28 @@ async function getConfig() {
   return res.json();
 }
 
+async function fetchGroups(supabaseUrl, supabaseAnon) {
+  const params = new URLSearchParams({
+    select: 'id,nome,descricao,icone,ordem',
+    order:  'ordem.asc',
+  });
+  const res = await fetch(`${supabaseUrl}/rest/v1/grupos_sistemas?${params}`, {
+    headers: {
+      'apikey':         supabaseAnon,
+      'Authorization':  `Bearer ${supabaseAnon}`,
+      'Accept-Profile': 'iam',
+    },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
 async function fetchSystems(supabaseUrl, supabaseAnon) {
   const params = new URLSearchParams({
-    select: 'slug,nome,descricao,ambiente,url_base,icone',
-    status: 'eq.ativo',
-    order:  'nome.asc',
+    select:         'slug,nome,descricao,ambiente,url_base,icone,grupo_id,ordem',
+    status:         'eq.ativo',
+    mostrar_no_hub: 'eq.true',
+    order:          'ordem.asc',
   });
   const res = await fetch(`${supabaseUrl}/rest/v1/sistemas?${params}`, {
     headers: {
@@ -63,6 +81,25 @@ function esc(str) {
   }[c]));
 }
 
+function grupoSection(grupo, systems) {
+  const iconHtml = grupo.icone
+    ? `<iconify-icon icon="${esc(toIconifyId(grupo.icone))}" width="18" height="18" style="flex-shrink:0"></iconify-icon>`
+    : '';
+  return `
+    <section class="grupo-section">
+      <div class="grupo-header">
+        ${iconHtml}
+        <div class="grupo-info">
+          <span class="grupo-nome">${esc(grupo.nome)}</span>
+          ${grupo.descricao ? `<span class="grupo-desc">${esc(grupo.descricao)}</span>` : ''}
+        </div>
+      </div>
+      <div class="grupo-cards">
+        ${systems.map(card).join('')}
+      </div>
+    </section>`;
+}
+
 function render(query = '') {
   const q = query.trim().toLowerCase();
   const filtered = allSystems.filter(s => {
@@ -74,8 +111,46 @@ function render(query = '') {
 
   const grid  = document.getElementById('grid');
   const empty = document.getElementById('empty');
-  grid.innerHTML = filtered.map(card).join('');
-  empty.classList.toggle('hidden', filtered.length > 0);
+
+  if (!filtered.length) {
+    grid.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  // Build groups
+  const byGrupo = new Map();
+  allGroups.forEach(g => byGrupo.set(g.id, []));
+  byGrupo.set('', []);
+
+  filtered.forEach(s => {
+    const key = s.grupo_id ?? '';
+    if (!byGrupo.has(key)) byGrupo.set(key, []);
+    byGrupo.get(key).push(s);
+  });
+
+  let html = '';
+
+  // Named groups (in order)
+  allGroups.forEach(g => {
+    const sArr = byGrupo.get(g.id) ?? [];
+    if (sArr.length) html += grupoSection(g, sArr);
+  });
+
+  // Ungrouped
+  const ungrouped = byGrupo.get('') ?? [];
+  if (ungrouped.length) {
+    if (html) {
+      // Show ungrouped systems without a header if there are named groups
+      html += `<section class="grupo-section grupo-section-plain"><div class="grupo-cards">${ungrouped.map(card).join('')}</div></section>`;
+    } else {
+      // All systems are ungrouped — just show the flat grid
+      html = `<div class="grupo-cards">${ungrouped.map(card).join('')}</div>`;
+    }
+  }
+
+  grid.innerHTML = html;
 }
 
 async function init() {
@@ -85,7 +160,10 @@ async function init() {
 
   try {
     const { url, anon } = await getConfig();
-    allSystems = await fetchSystems(url, anon);
+    [allGroups, allSystems] = await Promise.all([
+      fetchGroups(url, anon),
+      fetchSystems(url, anon),
+    ]);
   } catch (e) {
     loading.classList.add('hidden');
     errEl.textContent = 'Erro ao carregar sistemas. Tente novamente.';

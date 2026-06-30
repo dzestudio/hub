@@ -83,21 +83,36 @@ function esc(str) {
 
 function grupoSection(grupo, systems) {
   const iconHtml = grupo.icone
-    ? `<iconify-icon icon="${esc(toIconifyId(grupo.icone))}" width="18" height="18" style="flex-shrink:0"></iconify-icon>`
+    ? `<iconify-icon icon="${esc(toIconifyId(grupo.icone))}" width="20" height="20" style="flex-shrink:0;color:var(--canvas-mid)"></iconify-icon>`
     : '';
+  const id = `grupo-${grupo.id}`;
   return `
-    <section class="grupo-section">
-      <div class="grupo-header">
-        ${iconHtml}
-        <div class="grupo-info">
-          <span class="grupo-nome">${esc(grupo.nome)}</span>
-          ${grupo.descricao ? `<span class="grupo-desc">${esc(grupo.descricao)}</span>` : ''}
+    <div class="grupo-card" onclick="toggleGrupo('${id}')">
+      <div class="grupo-card-header">
+        <div class="grupo-card-left">
+          ${iconHtml}
+          <div class="grupo-info">
+            <span class="grupo-nome">${esc(grupo.nome)}</span>
+            ${grupo.descricao ? `<span class="grupo-desc">${esc(grupo.descricao)}</span>` : ''}
+          </div>
+        </div>
+        <div class="grupo-card-right">
+          <span class="grupo-count">${systems.length} sistema${systems.length !== 1 ? 's' : ''}</span>
+          <span class="grupo-chevron" id="chevron-${id}">&#9660;</span>
         </div>
       </div>
-      <div class="grupo-cards">
+      <div class="grupo-cards" id="${id}">
         ${systems.map(card).join('')}
       </div>
-    </section>`;
+    </div>`;
+}
+
+function toggleGrupo(id) {
+  const cards   = document.getElementById(id);
+  const chevron = document.getElementById('chevron-' + id);
+  if (!cards) return;
+  const open = cards.classList.toggle('collapsed');
+  if (chevron) chevron.style.transform = open ? 'rotate(-90deg)' : '';
 }
 
 function render(query = '') {
@@ -142,10 +157,8 @@ function render(query = '') {
   const ungrouped = byGrupo.get('') ?? [];
   if (ungrouped.length) {
     if (html) {
-      // Show ungrouped systems without a header if there are named groups
-      html += `<section class="grupo-section grupo-section-plain"><div class="grupo-cards">${ungrouped.map(card).join('')}</div></section>`;
+      html += `<div class="grupo-cards grupo-cards-plain">${ungrouped.map(card).join('')}</div>`;
     } else {
-      // All systems are ungrouped — just show the flat grid
       html = `<div class="grupo-cards">${ungrouped.map(card).join('')}</div>`;
     }
   }
@@ -186,5 +199,7 @@ async function init() {
     render(search.value);
   });
 }
+
+window.toggleGrupo = toggleGrupo;
 
 init();

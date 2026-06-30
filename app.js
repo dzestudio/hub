@@ -56,7 +56,7 @@ function card(s) {
     : `<p class="card-desc card-desc-empty">Sem descrição.</p>`;
 
   const action = s.url_base
-    ? `<a class="card-btn" href="${esc(s.url_base)}" target="_blank" rel="noopener">Abrir</a>`
+    ? `<a class="card-btn" href="/${esc(s.slug)}">Abrir</a>`
     : `<button class="card-btn disabled" disabled>Sem URL</button>`;
 
   const iconHtml = s.icone
